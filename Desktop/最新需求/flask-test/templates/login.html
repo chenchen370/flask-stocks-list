@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录</title>
+  <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+  <link href="./static/css/layui.css" rel="stylesheet">
+  <script src="./static/js/layui.js"></script>
+</head>
+<body>
+<style>
+  .demo-login-container{width: 320px; margin: 21px auto 0;}
+   #canvas {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
+<form class="layui-form">
+  <div class="demo-login-container">
+    <div class="layui-form-item">
+      <div class="layui-input-wrap">
+        <div class="layui-input-prefix">
+          <i class="layui-icon layui-icon-username"></i>
+        </div>
+        <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-wrap">
+        <div class="layui-input-prefix">
+          <i class="layui-icon layui-icon-password"></i>
+        </div>
+        <input type="password" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-row">
+        <div class="layui-col-xs7">
+          <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+              <i class="layui-icon layui-icon-vercode"></i>
+            </div>
+            <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+          </div>
+        </div>
+        <div class="layui-col-xs5">
+          <div style="margin-left: 16px;">
+            <canvas id="canvas" width="100" height="36"></canvas>
+              </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">登录</button>
+    </div>
+ <div class="layui-form-item demo-login-other">
+      <label>社交账号登录</label>
+      <span style="padding: 0 21px 0 6px;">
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-qq" style="color: #3492ed;"></i></a>
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29;"></i></a>
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900;"></i></a>
+      </span>
+      或 <a href="/register">注册帐号</a>
+    </div>
+  </div>
+</form>
+
+<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
+
+<script>
+layui.define(function(exports) {
+  var $ = layui.jquery;
+  var obj = {
+    randomColor: function() { //得到随机的颜色值
+      var r = Math.floor(Math.random() * 256);
+      var g = Math.floor(Math.random() * 256);
+      var b = Math.floor(Math.random() * 256);
+      return "rgb(" + r + "," + g + "," + b + ")";
+    },
+    draw: function(show_num) {
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+      var canvas_width = canvas.width;
+      var canvas_height = canvas.height;
+
+      context.clearRect(0, 0, canvas_width, canvas_height); // 清除画布
+
+      var sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,1,2,3,4,5,6,7,8,9,0";
+      var aCode = sCode.split(",");
+      var aLength = aCode.length;
+
+      for (var i = 0; i < 4; i++) {
+        var j = Math.floor(Math.random() * aLength);
+        var deg = Math.random() * 30 * Math.PI / 180;
+        var txt = aCode[j];
+        show_num[i] = txt.toLowerCase();
+        var x = 10 + i * 20;
+        var y = 20 + Math.random() * 8;
+        context.font = "bold 23px 微软雅黑";
+
+        context.save();
+        context.translate(x, y);
+        context.rotate(deg);
+
+        context.fillStyle = this.randomColor();
+        context.fillText(txt, 0, 0);
+
+        context.restore();
+      }
+
+      for (var i = 0; i < 5; i++) {
+        context.strokeStyle = this.randomColor();
+        context.beginPath();
+        context.moveTo(Math.random() * canvas_width, Math.random() * canvas_height);
+        context.lineTo(Math.random() * canvas_width, Math.random() * canvas_height);
+        context.stroke();
+      }
+
+      for (var i = 0; i < 30; i++) {
+        context.strokeStyle = this.randomColor();
+        context.beginPath();
+        var x = Math.random() * canvas_width;
+        var y = Math.random() * canvas_height;
+        context.moveTo(x, y);
+        context.lineTo(x + 1, y + 1);
+        context.stroke();
+      }
+    },
+  };
+  exports('captcha', obj);
+});
+
+layui.use(['captcha'], function() {
+  var form = layui.form;
+  var layer = layui.layer;
+  var $ = layui.jquery;
+  var captcha = layui.captcha;
+
+  var show_num = [];
+  captcha.draw(show_num);
+
+  // 点击验证码重新生成
+  $("#canvas").on('click', function() {
+    captcha.draw(show_num);
+  });
+
+  // 表单提交事件
+  form.on('submit(demo-login)', function(data) {
+    var field = data.field; // 获取表单字段值
+    var code = field["captcha"];
+
+    if (show_num.join("") !== code.toLowerCase()) {
+      layer.msg('验证码错误,请重新输入', {
+        offset: '15px',
+        icon: 5
+      });
+      return false; // 阻止表单提交
+    }
+      $.ajax({
+      type: 'GET',
+      data: field,
+      url: '/valid',
+      success: function(res) {
+        console.log(res.result.code);
+
+        // 检查返回的 code 值
+        if (res.result.code === 1) {
+          if(res.result.data[0].role==="0"){
+              window.location.href = '/index'; // 替换为实际跳转页面的 URL
+          }else{
+              window.location.href = '/admin'; // 替换为实际跳转页面的 URL
+          }
+          // 登录成功，跳转到另一个页面
+        } else {
+          // 登录失败，显示错误信息
+          layer.msg('用户名或密码错误，请重新输入', {
+            offset: '15px',
+            icon: 5
+          });
+        }
+      },
+      error: function(err) {
+        console.log(err);
+        layer.msg('请求失败，请稍后再试', {
+          offset: '15px',
+          icon: 5
+        });
+      }
+    });
+
+    return false; // 阻止表单提交
+  });
+});
+</script>
+
+</body>
+</html>

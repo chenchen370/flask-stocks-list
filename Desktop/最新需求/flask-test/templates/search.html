@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时搜索示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh; /* Full viewport height */
+        }
+        .container {
+            margin-top: 100px;
+            text-align: center;
+            position: relative; /* For positioning suggestions */
+        }
+        #search-box {
+            width: 500px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        #suggestions {
+            border: 1px solid #ccc;
+            border-top: none;
+            width: 500px; /* Match width with input */
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            background-color: #fff;
+            z-index: 1000;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="./static/img/img.png" alt="Logo" class="logo-image" style="height:60px;width:200px">
+        <h6>各大公司中报陆续发布，熊市末端让我们一起挖啊挖啊挖</h6>
+        <input type="text" id="search-box" placeholder="输入股票名称、代码或拼音缩写,一键生成公司财务分析报告">
+        <div id="suggestions"></div>
+    </div>
+
+    <script>
+        const suggestionsEndpoint = '/stock_list';
+        let debounceTimeout;
+
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`${suggestionsEndpoint}?query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const suggestions = await response.json();
+                return suggestions;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return [];
+            }
+        }
+
+        function debounce(func, delay) {
+            return function(...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        async function showSuggestions(value) {
+            console.log(value);
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = ''; // Clear current suggestions
+
+            if (value.length > 0) {
+                const suggestions = await fetchSuggestions(value);
+
+                const filteredSuggestions = suggestions
+                    .filter(item => item.toLowerCase().includes(value.toLowerCase()))
+                    .filter((item, index, self) => self.indexOf(item) === index); // Ensure unique items
+
+                console.log(filteredSuggestions);
+
+                filteredSuggestions.forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('suggestion-item');
+                    div.textContent = item;
+                    div.onclick = () => selectSuggestion(item);
+                    suggestionsDiv.appendChild(div);
+                });
+            }
+        }
+
+        const debouncedShowSuggestions = debounce(showSuggestions, 100);
+
+        // Bind the debounced function to the input event
+        document.getElementById('search-box').addEventListener('input', (e) => {
+            debouncedShowSuggestions(e.target.value);
+        });
+
+        function selectSuggestion(item) {
+            const baseURL = '/basic_info?query=';
+            const query = encodeURIComponent(item);
+            window.location.href = baseURL + query;
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#search-box') && !e.target.closest('#suggestions')) {
+                document.getElementById('suggestions').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

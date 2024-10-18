@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>layout 后台大布局 - Layui</title>
+  <link href="./static/css/layui.css" rel="stylesheet">
+  <style>
+    .layui-header {
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+    }
+    .search-bar {
+      margin-left: 1000px; /* Adjusted to a more reasonable position */
+      padding: 5px;
+      border-radius: 16px; /* Rounded corners */
+    }
+    .layui-body {
+      padding: 15px;
+      overflow: hidden; /* Hide overflow to manage content visibility */
+    }
+    .content-section {
+      display: none; /* Hide all sections by default */
+      width: 100%;
+      height: calc(100vh - 100px); /* Adjust height to fit the view */
+    }
+    .content-section iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <div class="layui-logo layui-hide-xs layui-bg-black">
+        后台管理系统
+      </div>
+       头部区域
+      <ul class="layui-nav layui-layout-left">
+        <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+          <i class="layui-icon layui-icon-spread-left"></i>
+        </li>
+      </ul>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+          <a href="javascript:;">
+            <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+            tester
+          </a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;">Your Profile</a></dd>
+            <dd><a href="javascript:;">Settings</a></dd>
+            <dd><a href="/">Sign out</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+          <a href="javascript:;">
+            <i class="layui-icon layui-icon-more-vertical"></i>
+          </a>
+        </li>
+      </ul>
+      <!-- 搜索框 -->
+<!--      <div class="search-bar">-->
+<!--        <input type="text" id="search-box" placeholder="搜索..." class="layui-input">-->
+<!--      </div>-->
+    </div>
+
+    <div class="layui-side layui-bg-black">
+      <div class="layui-side-scroll">
+        <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+        <ul class="layui-nav layui-nav-tree" lay-filter="test">
+          <li class="layui-nav-item layui-nav-itemed">
+            <a class="" href="javascript:;" data-href="/admin_user">首页</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layui-body">
+      <!-- 内容主体区域 -->
+      <iframe src="/admin_user" id="main" width="100%" style="height: calc(100vh - 100px);" frameborder="0"></iframe>
+    </div>
+    <div class="layui-footer">
+      <!-- 底部固定区域 -->
+      © layui.com - 底部固定区域
+    </div>
+</div>
+<script src="./static/js/layui.js"></script>
+<script>
+// JavaScript代码区域
+layui.use(['element','jquery'], function(){
+  var $ = layui.jquery;
+  var element = layui.element;
+
+  // 更新 iframe 的 src 属性
+  $(document).ready(function(){
+    $("a[data-href]").click(function (e) {
+      e.preventDefault();
+      var href = $(this).data("href");
+      $("#main").attr("src", href);
+    });
+  });
+
+  // 搜索功能
+  $('#search-box').on('keyup', function() {
+    var query = $(this).val().toLowerCase();
+    $('ul.layui-nav-tree li a').each(function() {
+      var text = $(this).text().toLowerCase();
+      $(this).closest('li').toggle(text.indexOf(query) !== -1);
+    });
+  });
+});
+</script>
+</body>
+</html>

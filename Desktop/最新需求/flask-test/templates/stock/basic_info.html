@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        /* 简单的样式以帮助排版 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .section {
+            padding: 20px;
+        }
+        .com_tit {
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="section jbzl">
+        <div class="segment com_tit">
+            <span class="title">基本资料</span>
+        </div>
+        <div class="jbzl_table">
+            <table>
+                <tr>
+                    <th style="width: 20%;">公司名称</th>
+                    <td colspan="3"><< result[0].company_name >></td>
+                </tr>
+                <tr>
+                    <th style="width: 20%;">股票代码</th>
+                    <td style="width: 30%;"><< result[0].Stock_Code >></td>
+                    <th style="width: 20%;">统一社会信用代码</th>
+                    <td style="width: 30%;"><< result[0].unified_social_credit_code >></td>
+                </tr>
+
+                <tr>
+                    <th>交易所代码</th>
+                    <td colspan="3"><< result[0].exchange_code >></td>
+                </tr>
+                <tr>
+                    <th>主要业务及产品</th>
+                    <td colspan="3"><< result[0].main_business_and_products >></td>
+                </tr>
+                <tr>
+                    <th>总经理</th>
+                    <td><< result[0].general_manager >></td>
+                    <th>法人代表</th>
+                    <td><< result[0].legal_representative >></td>
+                </tr>
+                <tr>
+                    <th>董秘</th>
+                    <td><< result[0].secretary >></td>
+                    <th>董事长</th>
+                    <td>--</td>
+                </tr>
+
+                <tr>
+                    <th>公告时间</th>
+                    <td><< result[0].announcement_date >></td>
+                    <th>电子信箱</th>
+                    <td><< result[0].email >></td>
+                </tr>
+                <tr>
+                    <th>传真</th>
+                    <td>--</td>
+                    <th>公司网址</th>
+                    <td><a target="_blank" href="<< result[0].company_website >>"><< result[0].company_website >></a></td>
+                </tr>
+                <tr>
+                    <th>办公地址</th>
+                    <td><< result[0].office_address >></td>
+                    <th>注册地址</th>
+                    <td><< result[0].province >><< result[0].city >></td>
+                </tr>
+                <tr>
+                    <th>区域</th>
+                    <td><< result[0].city >></td>
+                    <th>邮政编码</th>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <th>注册资本(元)</th>
+                    <td><< result[0].registered_capital >>万元</td>
+                    <th>注册日期</th>
+                    <td><< result[0].registration_date >></td>
+                </tr>
+                <tr>
+                    <th>员工人数</th>
+                    <td><< result[0].number_of_employees >></td>
+                    <th>管理人员人数</th>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <th>经营范围</th>
+                    <td colspan="3">
+                        << result[0].business_scope >>
+                    </td>
+                </tr>
+                <tr>
+                    <th>公司简介</th>
+                    <td colspan="3">
+                        << result[0].company_introduction >>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div>
+        <iframe src="/candlesticku_sh?query=<<result[0].Stock_Code>>" style="border: none; width: 100%; height: 600px;"></iframe>
+    </div>
+</body>
+</html>

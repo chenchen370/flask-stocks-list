@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo</title>
+  <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+  <link href="./static/css/layui.css" rel="stylesheet">
+  <script src="./static/js/layui.js"></script>
+</head>
+<body>
+<span class="layui-breadcrumb">
+  <a href="/index" target="_blank">首页</a>
+  <a href="#">更换个人信息</a>
+</span>
+<div style="padding-left:200px"><h2>更换个人信息</h2></div>
+<form class="layui-form" action="">
+  <div class="layui-form-item">
+    <div class="layui-input-inline layui-input-wrap">
+      <button type="button" class="layui-btn" id="editInfo" >更换个人信息</button>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">用户名</label>
+    <div class="layui-input-inline layui-input-wrap">
+      <input type="text" name="username" value="<< result[0].UserName >>" readonly class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">密码</label>
+    <div class="layui-input-inline layui-input-wrap">
+      <input type="password" name="password" value="*******" readonly class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-text-em">6 到 12 位字符</div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">邮箱</label>
+    <div class="layui-input-inline layui-input-wrap">
+      <input type="email" name="email" value="<< result[0].Email >>" readonly class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">电话号码</label>
+    <div class="layui-input-inline layui-input-wrap">
+      <input type="tel" name="phone" value="<< result[0].Phone >>" readonly class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">注册时间</label>
+    <div class="layui-input-inline layui-input-wrap">
+      <input type="text" name="join_time" id="date" value="<< result[0].joinTime >>" readonly class="layui-input">
+    </div>
+  </div>
+
+
+
+</form>
+
+<script>
+layui.use(['form', 'layer', 'laydate'], function(){
+  var form = layui.form;
+  var layer = layui.layer;
+  var laydate = layui.laydate;
+var $=layui.$;
+  // 日期
+  laydate.render({
+    elem: '#date'
+  });
+
+  // 监听“更换个人信息”按钮点击事件
+  document.getElementById('editInfo').onclick = function(){
+    layer.open({
+      type: 1,
+      title: '编辑个人信息',
+      area: ['500px', '400px'],
+      content: `
+        <form class="layui-form" id="editForm" style="padding: 20px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+              <input type="text" name="username" value="<< result[0].UserName >>" required lay-verify="required" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" value="*******" required lay-verify="required|pass" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-text-em">6 到 12 位字符</div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-block">
+              <input type="email" name="email" value="<< result[0].Email >>" required lay-verify="required|email" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">电话号码</label>
+            <div class="layui-input-block">
+              <input type="tel" name="phone" value="<< result[0].Phone >>" required lay-verify="required|phone" class="layui-input">
+              <button type="submit" class="layui-btn" lay-submit lay-filter="editSubmit">确定</button>
+              <button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll()">取消</button>
+            </div>
+          </div>
+        </form>
+      `,
+      success: function(layero, index){
+        // 渲染表单以确保 LayUI 工作正常
+        form.render();
+      }
+    });
+  };
+
+  // 自定义验证规则
+  form.verify({
+    pass: function(value) {
+      if (!/(.+){6,12}$/.test(value)) {
+        return '密码必须 6 到 12 位';
+      }
+    },
+    email: function(value) {
+      if (!/^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/.test(value)) {
+        return '请输入正确的邮箱格式';
+      }
+    },
+    phone: function(value) {
+      if (!/^1\d{10}$/.test(value)) {
+        return '请输入正确的手机号';
+      }
+    }
+  });
+
+  // 监听弹出表单的提交事件
+  form.on('submit(editSubmit)', function(data){
+    // 获取表单数据
+    var field = data.field;
+
+    // 使用 AJAX 发送数据到后端
+    $.ajax({
+      type: 'POST',
+      url: '/update_personal_info', // 假设后端的路由为 /update_personal_info
+      data: field,
+      success: function(res) {
+        if(res.success){
+          layer.msg('更新成功', {icon: 1});
+          // 关闭弹出层
+          layer.closeAll();
+          // 可在此处刷新页面或更新页面数据
+        } else {
+          layer.msg('更新失败: ' + res.message, {icon: 5});
+        }
+      },
+      error: function(err) {
+        console.error(err);
+        layer.msg('请求失败，请稍后再试', {icon: 5});
+      }
+    });
+
+    return false; // 阻止表单跳转
+  });
+
+});
+</script>
+
+</body>
+</html>
